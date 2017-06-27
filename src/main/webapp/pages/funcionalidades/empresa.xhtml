@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/estrutura.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+
+	<ui:insert name="cabecalho" />
+	<ui:define name="conteudo">
+		<h:panelGroup layout="block" id="conteudo" styleClass="divprincipal">
+			<h:form id="form" enctype="multipart/form-data">
+				<prime:panel
+					header="SGPO - Sistema de Gerenciamento de Pedidos Online"
+					id="panelgeral">
+					<h:panelGroup layout="block" id="menubar">
+						<ui:include src="/pages/menubar.xhtml" />
+					</h:panelGroup>
+					<h:panelGroup layout="block" id="imgbanner"
+						style="heigth:90px; background-color:black;">
+						<h:graphicImage value="/resources/imagens/empresas/#{usuarioLogadoBean.usuarioLogado.empresa.id}.jpg" width="100%" 
+ 							rendered="#{usuarioLogadoBean.usuarioLogado.empresa != null and usuarioLogadoBean.usuarioLogado.empresa.imagemExiste}"/>
+ 						<h:graphicImage value="/resources/imagens/empresas/banner.png" width="100%" 
+ 							rendered="#{usuarioLogadoBean.usuarioLogado.empresa == null or !usuarioLogadoBean.usuarioLogado.empresa.imagemExiste}"/>
+					</h:panelGroup>
+					<h:panelGroup layout="block" id="corpo">
+						<prime:panel header="Cadastro e Alteração de empresas"
+							id="cadastro">
+							<prime:panel header="Dados do empresa" id="empresasCadastro">
+								<h:panelGrid columns="2" id="camposGrid" style="width: 100%;">
+
+									<h:panelGrid columns="2" id="campos">
+										<h:outputLabel value="#{msg.label_nome}" />
+										<h:panelGrid columns="2">
+											<prime:inputText id="nome"
+												value="#{empresaBean.empresa.nome}" required="true"
+												requiredMessage="Campo de preenchimento obrigatório." />
+											<prime:message for="nome" />
+										</h:panelGrid>
+
+										<h:outputLabel value="CNPJ:" />
+										<h:panelGrid columns="2">
+											<prime:inputMask id="cnpj" mask="99.999.999/9999-99"
+												value="#{empresaBean.empresa.cnpj}" required="true"
+												requiredMessage="Campo de preenchimento obrigatório." />
+											<prime:message for="cnpj" />
+										</h:panelGrid>
+										<h:outputLabel value="#{msg.label_telefone}" />
+										<h:panelGrid columns="2">
+											<prime:inputMask value="#{empresaBean.empresa.telefone}"
+												required="true"
+												requiredMessage="Campo de preenchimento obrigatório."
+												id="telefone" mask="(99) 9999-9999" />
+											<prime:message for="telefone" />
+										</h:panelGrid>
+
+										<h:outputLabel value="Endereço" />
+										<h:panelGrid columns="2">
+											<prime:inputText id="endereco" required="true"
+												requiredMessage="Campo de preenchimento obrigatório."
+												value="#{empresaBean.empresa.endereco}" />
+											<prime:message for="endereco" />
+										</h:panelGrid>
+
+										<h:outputLabel value="Situação" />
+										<h:panelGrid columns="2">
+											<h:selectOneMenu value="#{empresaBean.empresa.ativoInativo}"
+												id="situacao" required="true"
+												requiredMessage="Campo de preenchimento obrigatório.">
+												<f:selectItems value="#{empresaBean.situacoes}" />
+											</h:selectOneMenu>
+											<prime:message for="situacao" />
+										</h:panelGrid>
+
+										<h:outputLabel value="Imagem (728x90px)" />
+
+										<h:form id="form2" enctype="multipart/form-data">
+											<h:panelGrid columns="2">
+												<prime:fileUpload value="#{empresaBean.file}" mode="simple"
+													id="imagem" />
+												<prime:message for="imagem" />
+											</h:panelGrid>
+										</h:form>
+
+
+									</h:panelGrid>
+
+									<prime:spacer height="10px" />
+
+									<h:panelGrid columns="3">
+										<h:commandButton value="Salvar"
+											action="#{empresaBean.salvarEmpresa()}">
+											<f:param name="cid" value="#{empresaBean.conversation.id}" />
+										</h:commandButton>
+										<h:commandButton value="Voltar"
+											action="#{empresaBean.voltaPesquisa()}" immediate="true" />
+									</h:panelGrid>
+								</h:panelGrid>
+							</prime:panel>
+						</prime:panel>
+					</h:panelGroup>
+				</prime:panel>
+			</h:form>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

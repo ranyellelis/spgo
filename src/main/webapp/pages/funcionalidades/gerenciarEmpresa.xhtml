@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+		<prime:panel header="Cadastro e Alteração de empresas"
+			id="cadastro">
+			<prime:panel header="Dados do empresa" id="empresasCadastro">
+				<h:panelGrid columns="2" id="camposGrid" style="width: 100%;">
+					<h:panelGrid columns="2" id="campos">
+						<h:outputLabel value="#{msg.label_nome}" />
+						<prime:inputText id="nome" value="#{empresaBean.nome}" />
+
+						<h:outputLabel value="CNPJ" />
+						<prime:inputText id="cnpj" value="#{empresaBean.cnpj}"/>
+					</h:panelGrid>
+
+					<prime:spacer height="10px" />
+
+					<h:panelGrid columns="3">
+						<h:commandButton value="Novo" action="#{empresaBean.novoEmpresa}"
+							immediate="true">
+							<f:param name="cid" value="#{empresaBean.conversation.id}" />
+						</h:commandButton>
+
+						<h:commandButton value="Pesquisar"
+							action="#{empresaBean.pesquisarEmpresas()}">
+							<f:ajax event="action" execute=":form:cadastro" render=":globalMsgs :form:empresasTabela" />
+							<f:param name="cid" value="#{empresaBean.conversation.id}" />
+						</h:commandButton>
+						<h:commandButton value="Voltar" action="#{empresaBean.voltar}" immediate="true" />
+					</h:panelGrid>
+				</h:panelGrid>
+			</prime:panel>
+
+			<prime:spacer height="8px" />
+
+				<prime:dataTable value="#{empresaBean.empresas}"
+					id="empresasTabela" paginator="true" paginatorAlwaysVisible="false"
+					emptyMessage="Nenhum registro encontrado." var="empresa">
+
+					<f:facet name="header">
+						<prime:outputLabel value="Resultado" />
+					</f:facet>
+
+					<prime:column>
+						<f:facet name="header">
+							<prime:outputLabel value="Nome" />
+						</f:facet>
+						<h:outputText value="#{empresa.nome}" />
+					</prime:column>
+
+					<prime:column>
+						<f:facet name="header">
+							<prime:outputLabel value="CNPJ" />
+						</f:facet>
+						<h:outputText value="#{empresa.cnpj}" />
+					</prime:column>
+
+					<prime:column>
+						<f:facet name="header">
+							<prime:outputLabel value="Telefone" />
+						</f:facet>
+						<h:outputText value="#{empresa.telefone}" />
+					</prime:column>
+
+
+					<prime:column style="text-align:center;">
+						<f:facet name="header">
+							<prime:outputLabel value="Ações" />
+						</f:facet>
+
+						<h:commandLink action="#{empresaBean.editarEmpresa(empresa)}">
+							<h:graphicImage value="/resources/imagens/ico16_alterar.gif" width="30px" height="30px" alt="Alterar" />
+							<f:param name="cid" value="#{empresaBean.conversation.id}" />
+						</h:commandLink>
+						<prime:spacer width="10px" />
+						<h:commandLink
+							action="#{empresaBean.excluirEmpresa(empresa)}">
+							<h:graphicImage value="/resources/imagens/ico16_excluir.gif" width="30px" height="30px" alt="Excluir" />
+							<f:param name="cid" value="#{empresaBean.conversation.id}" />
+							<f:ajax event="action" execute="@this" render=":globalMsgs empresasTabela" />
+						</h:commandLink>
+					</prime:column>
+				</prime:dataTable>
+		</prime:panel>
+	</ui:define>
+</ui:composition>

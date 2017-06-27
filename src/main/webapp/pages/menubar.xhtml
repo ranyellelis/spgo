@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:prime="http://primefaces.org/ui">
+
+	<prime:menubar rendered="#{usuarioLogadoBean.logado}">
+		<prime:menuitem value="Novo Pedido" icon="ui-icon-contact"
+			url="/pages/funcionalidades/realizarPedido.xhtml"
+			rendered="#{usuarioLogadoBean.cliente}" />
+			
+		<prime:menuitem value="Visualizar" icon="ui-icon-contact"
+			url="/pages/funcionalidades/visualizarPedidos.xhtml"
+			rendered="#{usuarioLogadoBean.cliente}" />
+			
+			
+		<prime:menuitem value="Novo Pedido" icon="ui-icon-contact"
+			url="/pages/funcionalidades/realizarPedidoCaixa.xhtml"
+			rendered="#{usuarioLogadoBean.garcom or usuarioLogadoBean.gerente}" />
+			
+		<prime:menuitem value="Atendimento" icon="ui-icon-contact"
+			url="/pages/funcionalidades/gerenciarPedido.xhtml" 
+			rendered="#{usuarioLogadoBean.funcionario}"/>
+
+		<prime:menuitem value="Pagamento" icon="ui-icon-contact"
+			url="/pages/funcionalidades/fecharConta.xhtml"
+			rendered="#{usuarioLogadoBean.gerente}" />
+
+		<prime:submenu label="Cadastro" icon="ui-icon-document" 
+			rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.administrador or usuarioLogadoBean.garcom}">
+			<prime:menuitem value="Produtos" icon="ui-icon-contact"
+				url="/pages/funcionalidades/cadastroProdutos.xhtml"
+				rendered="#{usuarioLogadoBean.gerente}" />
+			<prime:menuitem value="Tamanhos" icon="ui-icon-contact"
+				url="/pages/funcionalidades/cadastroTamanhos.xhtml"
+				rendered="#{usuarioLogadoBean.gerente}" />
+			<prime:menuitem value="Categorias" icon="ui-icon-contact"
+				url="/pages/funcionalidades/cadastroCategorias.xhtml"
+				rendered="#{usuarioLogadoBean.gerente}" />
+			<prime:menuitem value="Funcionários" icon="ui-icon-contact"
+				url="/pages/funcionalidades/cadastroFuncionarios.xhtml" 
+				rendered="#{usuarioLogadoBean.administrador or usuarioLogadoBean.gerente}" />
+			<prime:menuitem value="Clientes" icon="ui-icon-contact"
+				url="/pages/funcionalidades/cadastroClientes.xhtml" 
+				rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.garcom}"/>
+			<prime:menuitem value="Empresa" icon="ui-icon-contact"
+				url="/pages/funcionalidades/gerenciarEmpresa.xhtml"
+				rendered="#{usuarioLogadoBean.administrador}" />
+		</prime:submenu>
+		
+		<prime:menuitem value="Relatório" icon="ui-icon-contact"
+			url="/pages/funcionalidades/performance.xhtml"
+			rendered="#{usuarioLogadoBean.gerente}" />
+			
+		<prime:menuitem value="Pedidos" icon="ui-icon-contact"
+			url="/pages/funcionalidades/pedidos.xhtml"
+			rendered="#{usuarioLogadoBean.gerente}" />
+			
+		<prime:menuitem value="Sair" icon="ui-icon-close" immediate="true"
+			action="#{loginBean.logout()}" ajax="false" />
+	</prime:menubar>
+</ui:composition>

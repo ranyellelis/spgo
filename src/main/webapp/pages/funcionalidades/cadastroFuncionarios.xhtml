@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+		<prime:panel header="Cadastro e Alteração de funcionarios"
+			id="cadastro">
+			<prime:panel header="Dados do funcionario" id="funcionariosCadastro">
+				<h:panelGrid columns="2" id="camposGrid" style="width: 100%;">
+					<h:panelGrid columns="2" id="campos">
+						<h:outputLabel value="#{msg.label_nome}" />
+						<prime:inputText id="nome" value="#{funcionarioBean.nome}" />
+
+						<h:outputLabel value="Login" />
+						<prime:inputText id="login" value="#{funcionarioBean.login}"/>
+					</h:panelGrid>
+
+					<prime:spacer height="10px" />
+
+					<h:panelGrid columns="3">
+						<h:commandButton value="Novo" action="#{funcionarioBean.novoFuncionario}"
+							immediate="true">
+							<f:param name="cid" value="#{funcionarioBean.conversation.id}" />
+						</h:commandButton>
+
+						<h:commandButton value="Pesquisar"
+							action="#{funcionarioBean.pesquisarFuncionario()}">
+							<f:ajax event="action" execute=":form:cadastro"
+								render=":globalMsgs :form:funcionariosTabela" />
+							<f:param name="cid" value="#{funcionarioBean.conversation.id}" />
+						</h:commandButton>
+						<h:commandButton value="Voltar" action="#{funcionarioBean.voltar}"
+							immediate="true" />
+					</h:panelGrid>
+				</h:panelGrid>
+			</prime:panel>
+
+			<prime:spacer height="8px" />
+
+				<prime:dataTable value="#{funcionarioBean.funcionarios}"
+					id="funcionariosTabela" paginator="true" paginatorAlwaysVisible="false"
+					emptyMessage="Nenhum registro encontrado." var="funcionario">
+
+					<f:facet name="header">
+							<prime:outputLabel value="Resultado" />
+						</f:facet>
+
+
+					<prime:column style="text-align: center; width: 10%;">
+						<f:facet name="header">
+							<prime:outputLabel value="Login" />
+						</f:facet>
+						<h:outputText value="#{funcionario.login}" />
+					</prime:column>
+
+					<prime:column style="width: 45%;">
+						<f:facet name="header">
+							<prime:outputLabel value="Nome" />
+						</f:facet>
+						<h:outputText value="#{funcionario.nome}" />
+					</prime:column>
+
+					<prime:column style="width: 10%;">
+						<f:facet name="header">
+							<prime:outputLabel value="Perfil" />
+						</f:facet>
+						<h:outputText value="#{funcionario.tipoUsuario.value}" />
+					</prime:column>
+					
+					<prime:column style="width: 15%;">
+						<f:facet name="header">
+							<prime:outputLabel value="Telefone" />
+						</f:facet>
+						<h:outputText value="#{funcionario.telefone}" />
+					</prime:column>
+
+					<prime:column style="width: 10%;">
+						<f:facet name="header">
+							<prime:outputLabel value="Data de Nascimento" />
+						</f:facet>
+						<h:outputText value="#{funcionario.dataNascimento}"
+							converter="dateConverter" />
+					</prime:column>
+
+					<prime:column style="width: 10%; text-align:center;">
+						<f:facet name="header">
+							<prime:outputLabel value="Ações" />
+						</f:facet>
+
+						<h:commandLink action="#{funcionarioBean.editarFuncionario(funcionario)}">
+							<h:graphicImage value="/resources/imagens/ico16_alterar.gif" width="30px" height="30px" alt="Alterar" />
+							<f:param name="cid" value="#{funcionarioBean.conversation.id}" />
+						</h:commandLink>
+						<prime:spacer width="10px" />
+						<h:commandLink
+							action="#{funcionarioBean.excluirFuncionario(funcionario)}">
+							<h:graphicImage value="/resources/imagens/ico16_excluir.gif"
+								width="30px" height="30px" alt="Excluir" />
+							<f:param name="cid" value="#{funcionarioBean.conversation.id}" />
+							<f:ajax event="action" execute="@this"
+								render=":globalMsgs funcionariosTabela" />
+						</h:commandLink>
+					</prime:column>
+
+
+				</prime:dataTable>
+		</prime:panel>
+	</ui:define>
+</ui:composition>

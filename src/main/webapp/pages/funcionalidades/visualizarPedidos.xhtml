@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+
+
+		<prime:growl id="globalMsg" globalOnly="true" />
+		<prime:panel header="Visualizar Pedidos" id="visualizarpedidos">
+			<h:panelGrid width="100%">
+
+				<prime:panel header="Dados do cliente" id="usuariosCadastro">
+					<h:panelGrid columns="2" id="campos">
+						<h:outputLabel value="#{msg.label_nome}:" />
+						<h:outputText value="#{visualizarPedidosBean.cliente.nome}" />
+
+						<h:outputLabel value="Login:" />
+						<h:outputText value="#{visualizarPedidosBean.cliente.login}" />
+
+						<h:outputLabel value="#{msg.label_telefone}:" />
+						<h:outputText value="#{visualizarPedidosBean.cliente.telefone}" />
+
+						<h:outputLabel value="Endereço:" />
+						<h:outputText value="#{visualizarPedidosBean.cliente.endereco}" />
+						
+						<h:outputLabel value="Alterar:" />
+						<h:commandLink action="#{clienteBean.editarClienteVisualizar(visualizarPedidosBean.cliente)}">
+							<h:graphicImage value="/resources/imagens/ico16_alterar.gif"
+								title="Detalhar" width="10%" height="auto" />
+							<f:param name="cid" value="#{clienteBean.conversation.id}" />
+						</h:commandLink>
+					</h:panelGrid>
+				</prime:panel>
+
+				<prime:spacer height="10px" />
+
+				<prime:dataTable id="efetuado"
+					value="#{visualizarPedidosBean.meusPedidos}" paginator="true"
+					paginatorAlwaysVisible="false" rows="5"
+					emptyMessage="#{msg.msg_nao_ha_registros}" var="p">
+
+					<f:facet name="header">
+						<h:outputText value="Meus Pedidos" />
+					</f:facet>
+
+					<prime:column style="width: 8%;  text-align:center;">
+						<f:facet name="header">
+							<h:outputText value="Número" />
+						</f:facet>
+						<h:outputText value="#{p.numero}" />
+					</prime:column>
+
+					<prime:column style="width: 48%;">
+						<f:facet name="header">
+							<h:outputText value="Itens" />
+						</f:facet>
+
+						<prime:dataTable value="#{p.items}"  var="it" styleClass="tabela">
+							<prime:column>
+								<prime:dataTable value="#{it.produtoTamanhos}" var="pt" styleClass="tabela">
+									<prime:column>
+										<h:outputText value="#{it.proporcao}" styleClass="fonte_negrito" />	
+										<h:outputText value=" " />
+										<h:outputText value="#{pt.produto.nome}" />
+									</prime:column>
+								</prime:dataTable>
+							</prime:column>
+						</prime:dataTable>
+
+					</prime:column>
+
+					<prime:column style="text-align: center; width: 8%;">
+						<f:facet name="header">
+							<h:outputText value="Valor" />
+						</f:facet>
+						<h:outputText value="#{p.valorPedido}">
+							<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+								type="currency" locale="PT-br" />
+						</h:outputText>
+
+					</prime:column>
+
+					<prime:column style="text-align: center; width: 8%;">
+						<f:facet name="header">
+							<h:outputText value="Local" />
+						</f:facet>
+						<h:outputText value="#{p.tipoPedido.value}" />
+						<h:outputText value=": #{p.mesa}"
+							rendered="#{p.tipoPedido eq 'MESA' or p.tipoPedido eq 'VIAGEM'}" />
+
+					</prime:column>
+
+					<prime:column style="text-align: center; width: 8%;">
+						<f:facet name="header">
+							<h:outputText value="Hora" />
+						</f:facet>
+						<h:outputText value="#{p.horaPedido}" />
+					</prime:column>
+					<prime:column style="text-align: center; width: 8%;">
+						<f:facet name="header">
+							<h:outputText value="Situação" />
+						</f:facet>
+						<h:graphicImage value="/resources/imagens/ico_efetuado.jpg"
+							title="Efetuado" width="60%" height="auto"
+							rendered="#{p.situacao eq 'EFETUADO'}" />
+						<h:graphicImage value="/resources/imagens/ico_cozinhando.jpg"
+							title="Preparando" width="60%" height="auto"
+							rendered="#{p.situacao eq 'PREPARANDO'}" />
+						<h:graphicImage value="/resources/imagens/ico_pronto.png"
+							title="Pronto" width="60%" height="auto"
+							rendered="#{p.situacao eq 'PRONTO'}" />
+						<h:graphicImage value="/resources/imagens/ico_garçom.jpg"
+							title="Entregando" width="60%" height="auto"
+							rendered="#{p.situacao eq 'ENTREGANDO'}" />
+						<h:graphicImage value="/resources/imagens/ico_entregue.jpeg"
+							title="Entregue" width="60%" height="auto"
+							rendered="#{p.situacao eq 'ENTREGUE'}" />
+						<h:graphicImage value="/resources/imagens/cancelar.png"
+							title="Cancelado" width="60%" height="auto"
+							rendered="#{p.situacao eq 'CANCELADO'}" />
+					</prime:column>
+				</prime:dataTable>
+
+				<prime:spacer height="10px" />
+
+				<prime:panel header="Ações" id="final">
+					<h:panelGroup layout="block">
+						<h:commandButton value="Atualizar"
+							action="#{visualizarPedidosBean.atualizar()}">
+							<f:ajax event="action" execute="@this" render=":globalMsgs :form" />
+							<f:param name="cid"
+								value="#{visualizarPedidosBean.conversation.id}" />
+						</h:commandButton>
+						<prime:spacer width="5px" />
+						<h:commandButton value="Voltar"
+							action="#{visualizarPedidosBean.voltar}" immediate="true" />
+					</h:panelGroup>
+					<prime:spacer height="20px" />
+				</prime:panel>
+			</h:panelGrid>
+		</prime:panel>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+
+		<prime:panel header="Fechamento de Pedidos" id="realizarpedidos">
+
+			<prime:panel header="Localizar cliente" id="cliente">
+				<prime:panelGrid columns="2" layout="grid">
+					<prime:autoComplete id="acNome" minQueryLength="2" var="cli"
+						itemLabel="#{cli.nome}" itemValue="#{cli}"
+						converter="usuarioConverter" style="width:100%;"
+						value="#{fecharContaBean.cliente}"
+						completeMethod="#{fecharContaBean.autoCompleteNome}"
+						placeholder="Nome">
+						<f:ajax event="itemSelect"
+							listener="#{fecharContaBean.onClienteSelecionado}"
+							render=":globalMsgs :form" />
+					</prime:autoComplete>
+					<prime:autoComplete id="acLogin" minQueryLength="2" var="cli"
+						itemLabel="#{cli.login}" itemValue="#{cli}"
+						converter="usuarioConverter" placeholder="Login"
+						style="width:100%;" value="#{fecharContaBean.cliente}"
+						completeMethod="#{fecharContaBean.autoCompleteLogin}">
+						<f:ajax event="itemSelect"
+							listener="#{fecharContaBean.onClienteSelecionado}"
+							render=":globalMsgs :form" />
+					</prime:autoComplete>
+				</prime:panelGrid>
+			</prime:panel>
+
+			<prime:spacer height="10px" />
+
+			<prime:panel header="Dados do cliente" id="dados_cliente"
+				rendered="#{fecharContaBean.cliente != null}">
+				<h:panelGrid columns="2" id="campos">
+					<h:outputLabel value="#{msg.label_nome}:" />
+					<h:outputText value="#{fecharContaBean.cliente.nome}" />
+
+					<h:outputLabel value="Login:" />
+					<h:outputText value="#{fecharContaBean.cliente.login}" />
+
+					<h:outputLabel value="#{msg.label_telefone}:" />
+					<h:outputText value="#{fecharContaBean.cliente.telefone}" />
+
+					<h:outputLabel value="Endereço:" />
+					<h:outputText value="#{fecharContaBean.cliente.endereco}" />
+				</h:panelGrid>
+			</prime:panel>
+
+			<prime:spacer height="10px" />
+
+			<prime:dataTable value="#{fecharContaBean.pedidos}"
+				rowIndexVar="linha" id="pedidosTabela"
+				emptyMessage="Nenhum pedido a pagar." var="p">
+
+				<f:facet name="header">
+					<h:outputText value="##### Pedidos #####" />
+				</f:facet>
+
+				<prime:column style="text-align:center; width: 5%;">
+					<f:facet name="header">
+						<h:outputText value="Num." />
+					</f:facet>
+					<h:outputText value="#{p.numero}" />
+				</prime:column>
+
+				<prime:column style="width: 70%;">
+					<f:facet name="header">
+						<h:outputText value="Descrição" />
+					</f:facet>
+
+					<prime:dataTable value="#{p.items}" var="i" paginator="false" styleClass="tabela"
+						rowIndexVar="nl">
+						<prime:column>
+							<f:facet name="header">
+								<h:outputLabel value="Produto" />
+							</f:facet>
+							<prime:dataTable value="#{i.produtoTamanhos}" var="pt"
+								styleClass="tabela">
+								<prime:column style="width:75%;">
+									<f:facet name="header">
+										<h:outputLabel value="Descrição" />
+									</f:facet>
+									<h:outputText value="#{i.proporcao}" styleClass="fonte_negrito" />
+									<h:outputText value=" " />
+									<h:outputText value="#{pt.produto.nome}" />
+								</prime:column>
+							</prime:dataTable>
+						</prime:column>
+						<prime:column style="text-align:center; width:15%;">
+							<f:facet name="header">
+								<h:outputLabel value="Valor" />
+							</f:facet>
+							<h:outputText value="#{i.valor}">
+								<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+									type="currency" locale="PT-br" />
+							</h:outputText>
+						</prime:column>
+					</prime:dataTable>
+
+
+
+
+
+
+
+
+
+
+
+				</prime:column>
+
+				<prime:column style="text-align: center; width: 10%;">
+					<f:facet name="header">
+						<h:outputText value="Valor" />
+					</f:facet>
+					<h:outputText value="#{p.valorPedido}">
+						<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+							type="currency" locale="PT-br" />
+					</h:outputText>
+				</prime:column>
+
+				<prime:column style="text-align: center; width: 10%;">
+					<f:facet name="header">
+						<h:outputText value="Hora" />
+					</f:facet>
+					<h:outputText value="#{p.horaPedido}" />
+				</prime:column>
+
+				<prime:column style="text-align: center; width: 10%;">
+					<f:facet name="header">
+						<h:outputText value="Pago?" />
+					</f:facet>
+					<h:commandLink action="#{fecharContaBean.pagarPedido(p)}">
+						<h:graphicImage value="/resources/imagens/ok_icon.png" width="40%"
+							height="auto" />
+						<f:param name="cid" value="#{fecharContaBean.conversation.id}" />
+						<f:ajax event="action" execute="@this" render=":globalMsgs :form" />
+					</h:commandLink>
+				</prime:column>
+			</prime:dataTable>
+
+			<prime:spacer height="10px" />
+
+			<prime:panel header="Finalizar" id="final"
+				style="display: table; width: 99.5%;">
+
+				<h:panelGroup layout="block" id="val"
+					rendered="#{!fecharContaBean.pedidos.isEmpty()}">
+					<h:panelGrid columns="11" id="valores">
+						<h:outputText value="Total:  " style="font-size:200% !important;"
+							styleClass="fonte_negrito" />
+						<prime:spacer width="15px" />
+						<h:outputText value="#{fecharContaBean.valorTotal}"
+							style="font-size:200% !important;"
+							styleClass="fonte_vermelha fonte_negrito">
+							<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+								type="currency" locale="PT-br" />
+						</h:outputText>
+
+						<prime:spacer width="15px" />
+
+						<h:outputText value="Dinheiro:  "
+							style="font-size:200% !important;" styleClass="fonte_negrito" />
+						<prime:spacer width="15px" />
+						<h:inputText value="#{fecharContaBean.dinheiro}" id="dindin"
+							style="font-size:200% !important;" size="8" maxlength="8"
+							styleClass="fonte_vermelha fonte_negrito">
+							<f:convertNumber pattern="0.00" currencySymbol="R$"
+								locale="pt-BR" />
+							<f:ajax event="blur" execute="valores" render="valores" />
+							<f:param name="cid" value="#{fecharContaBean.conversation.id}" />
+						</h:inputText>
+						<prime:spacer width="15px" />
+						<h:outputText value="Troco:  " style="font-size:200% !important;"
+							rendered="#{fecharContaBean.troco != null and fecharContaBean.troco > 0}"
+							styleClass="fonte_negrito" />
+						<prime:spacer width="15px" />
+						<h:outputText value="#{fecharContaBean.troco}" id="valorTroco"
+							style="font-size:200% !important;"
+							rendered="#{fecharContaBean.troco != null and fecharContaBean.troco > 0}"
+							styleClass="fonte_azul fonte_negrito">
+							<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+								type="currency" locale="PT-br" pattern="R$ 0.00" />
+						</h:outputText>
+					</h:panelGrid>
+
+					<h:panelGrid columns="7" id="racha">
+						<h:outputText value="Dividido por:  "
+							style="font-size:200% !important;" styleClass="fonte_negrito" />
+						<prime:spacer width="15px" />
+						<h:inputText value="#{fecharContaBean.qtdPessoas}" id="pessoas"
+							style="font-size:200% !important;"
+							styleClass="fonte_azul fonte_negrito" size="4" maxlength="4">
+							<f:convertNumber integerOnly="true" type="number" locale="PT-br" />
+							<f:ajax event="blur" execute="pessoas" render="racha" />
+							<f:param name="cid" value="#{fecharContaBean.conversation.id}" />
+						</h:inputText>
+						<prime:spacer width="15px" />
+						<h:outputText value="Valor:  " style="font-size:200% !important;"
+							styleClass="fonte_negrito"
+							rendered="#{fecharContaBean.valorRachado != null and fecharContaBean.valorRachado > 0}" />
+						<prime:spacer width="15px" />
+						<h:outputText value="#{fecharContaBean.valorRachado}"
+							id="vlrachado" style="font-size:200% !important;"
+							styleClass="fonte_azul fonte_negrito"
+							rendered="#{fecharContaBean.valorRachado != null and fecharContaBean.valorRachado > 0}">
+							<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+								type="currency" locale="PT-br" pattern="R$ 0.00" />
+						</h:outputText>
+					</h:panelGrid>
+				</h:panelGroup>
+
+				<prime:spacer height="20px" />
+
+				<h:panelGroup layout="block" style="float:right;" id="botoes">
+					<h:commandButton value="Pagar todos os pedidos"
+						rendered="#{!fecharContaBean.pedidos.isEmpty()}"
+						action="#{fecharContaBean.pagarTodosPedidos()}">
+						<f:ajax event="action" execute=":form:campos"
+							render=":globalMsgs :form" />
+						<f:param name="cid" value="#{fecharContaBean.conversation.id}" />
+					</h:commandButton>
+
+					<prime:spacer width="5px" />
+
+					<h:commandButton value="Voltar" action="#{fecharContaBean.voltar}"
+						immediate="true" />
+				</h:panelGroup>
+			</prime:panel>
+		</prime:panel>
+	</ui:define>
+</ui:composition>

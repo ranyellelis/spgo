@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+		<h:panelGroup layout="block" id="imprimir">
+			<prime:panel header="Relatório de vendas" id="realizarpedidos">
+
+
+				<h:panelGrid columns="9" id="campos">
+					<h:outputText value="Data Inicial:" />
+					<prime:inputMask mask="99/99/9999" id="dtinicial" size="9" value="#{performanceBean.dataInicial}" 
+						required="true" requiredMessage="Insira a data inicial"/>
+					
+					<prime:spacer width="10px" />
+					
+					<h:outputText value="Data Final:" />
+					<prime:inputMask mask="99/99/9999" id="dtfinal" size="9" value="#{performanceBean.dataFinal}" 
+						required="true" requiredMessage="Insira a data final"/>
+					<prime:spacer width="10px" />
+					<h:commandButton value="Pesquisar" action="#{performanceBean.pesquisar()}">
+						<f:ajax event="action" execute=":form:campos" render=":globalMsgs :form" />
+						<f:param name="cid" value="#{performanceBean.conversation.id}" />
+					</h:commandButton>
+					<prime:message for="dtinicial"/>
+					<prime:message for="dtfinal"/>
+				</h:panelGrid>
+				
+				<prime:spacer height="10px" />
+				
+				<h:panelGrid id="tabela"
+					rendered="#{!performanceBean.lista.isEmpty()}">
+					<prime:dataTable value="#{performanceBean.lista}" var="prod"
+						emptyMessage="Nenhum registro encontrado." rowIndexVar="linha">
+
+						<prime:column style="text-align:center; width: 10%;">
+							<f:facet name="header">
+								<h:outputText value="Num." />
+							</f:facet>
+							<h:outputText value="#{linha+1}" />
+						</prime:column>
+
+						<prime:column style="width: 50%;">
+							<f:facet name="header">
+								<h:outputText value="Nome" />
+							</f:facet>
+							<h:outputText value="#{prod.nome}" />
+						</prime:column>
+
+						<prime:column style="text-align:center; width: 10%;"
+							sortBy="#{prod.dia}">
+							<f:facet name="header">
+								<h:outputText value="Dia" />
+							</f:facet>
+							<h:outputText value="#{prod.dia}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</prime:column>
+
+						<prime:column style="text-align:center; width: 10%;"
+							sortBy="#{prod.qtd}">
+							<f:facet name="header">
+								<h:outputText value="Quant." />
+							</f:facet>
+							<h:outputText value="#{prod.qtd}" />
+						</prime:column>
+
+						<prime:column style="width: 10%; text-align:right;"
+							sortBy="#{prod.valor}">
+							<f:facet name="header">
+								<h:outputText value="Vl. Unid." />
+							</f:facet>
+							<h:outputText value="#{prod.valor}">
+								<f:convertNumber pattern="R$ 0.00" />
+							</h:outputText>
+						</prime:column>
+
+						<prime:column style="width: 10%; text-align:right;">
+							<f:facet name="header">
+								<h:outputText value="Vl. Total" />
+							</f:facet>
+							<h:outputText value="#{prod.valor * prod.qtd}">
+								<f:convertNumber pattern="R$ 0.00" />
+							</h:outputText>
+						</prime:column>
+					</prime:dataTable>
+
+					<h:panelGroup layout="block" style="float:right;">
+						<h:panelGrid columns="3"
+							rendered="#{!performanceBean.lista.isEmpty()}">
+							<h:outputText value="Valor Total Faturado:"
+								style="font-size:120% !important;" styleClass="fonte_negrito" />
+							<prime:spacer width="5px" />
+							<h:outputText value="#{performanceBean.valorTotal}"
+								style="font-size:120% !important;"
+								styleClass="fonte_negrito fonte_vermelha">
+								<f:convertNumber pattern="R$ 0.00" />
+							</h:outputText>
+						</h:panelGrid>
+					</h:panelGroup>
+				</h:panelGrid>
+			</prime:panel>
+		</h:panelGroup>
+		<prime:panel header="Finalizar" id="final"
+			style="display: table; width: 99.5%;">
+			<h:commandButton value="Voltar" action="#{fecharContaBean.voltar}"
+				immediate="true" />
+			<prime:spacer width="5px"/>
+			<h:commandButton value="Imprimir (A4)" immediate="true" rendered="#{!performanceBean.lista.isEmpty()}"
+				onclick="imprimirPedidoReload();" />
+		</prime:panel>
+	</ui:define>
+</ui:composition>

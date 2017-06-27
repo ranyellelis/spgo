@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition template="/pages/estrutura.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+
+	<ui:insert name="cabecalho" />
+
+	<ui:define name="conteudo">
+		<h:panelGroup layout="block" id="conteudo" styleClass="divprincipal">
+			<h:form id="form">
+				<prime:panel header="SGPO - Sistema de Gerenciamento de Pedidos Online" id="panelgeral"
+								footer="#{usuarioLogadoBean.usuarioLogado.empresa.nome}  #{usuarioLogadoBean.usuarioLogado.empresa.telefone}">
+					<h:panelGroup layout="block" id="menubar">
+						<ui:include src="/pages/menubar.xhtml" />
+					</h:panelGroup>
+					<h:panelGroup layout="block" id="imgbanner" style="heigth:90px; background-color:black;">
+ 						<h:graphicImage value="/resources/imagens/empresas/#{usuarioLogadoBean.usuarioLogado.empresa.id}.jpg" width="100%" 
+ 							rendered="#{usuarioLogadoBean.usuarioLogado.empresa != null and usuarioLogadoBean.usuarioLogado.empresa.imagemExiste}"/>
+ 						<h:graphicImage value="/resources/imagens/empresas/banner.png" width="100%" 
+ 							rendered="#{usuarioLogadoBean.usuarioLogado.empresa == null or !usuarioLogadoBean.usuarioLogado.empresa.imagemExiste}"/> 
+					</h:panelGroup>
+					<h:panelGroup layout="block" id="corpo">
+						<ui:insert name="corpo" />
+					</h:panelGroup>
+				</prime:panel>
+			</h:form>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+
+		<prime:panel header="Cadastro de Valores" id="cadastro">
+
+			<h:panelGrid columns="2" id="campos">
+				<h:outputLabel value="Produto: " />
+				<h:outputLabel value="#{produtoBean.produto.nome}" />
+			
+				<h:outputLabel value="Tamanho e Valor: " />
+				<h:panelGrid columns="5" id="entradaValor">
+
+					<h:selectOneMenu id="tamanho" value="#{produtoBean.tamanho}"
+						required="true"
+						requiredMessage="Campo de Preenchimento Obrigatório"
+						style="width:100px" converter="tamanhoConverter">
+						<f:selectItem itemLabel="Selecione" />
+						<f:selectItems value="#{produtoBean.tamanhos}" var="t"
+							itemLabel="#{t.nome}" itemValue="#{t}" />
+					</h:selectOneMenu>
+
+					<prime:inputText id="valor" value="#{produtoBean.valor}" size="10"
+						required="true"
+						requiredMessage="Campo de preenchimento obrigatório."
+						converterMessage="Digite um valor válido">
+						<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+							type="currency" locale="PT-br" pattern="#0.00" />
+					</prime:inputText>
+
+					<prime:spacer width="5px" />
+
+					<h:commandLink id="botao"
+						action="#{produtoBean.adicionarProdutoTamanho()}">
+						<h:graphicImage value="/resources/imagens/mais.png" width="30px" height="30px" />
+						<f:param name="cid" value="#{produtoBean.conversation.id}" />
+						<f:ajax event="action" execute="entradaValor"
+							render=":globalMsgs entradaValor valores" />
+					</h:commandLink>
+
+					<h:panelGrid>
+						<prime:message for="tamanho" />
+						<prime:message for="valor" />
+					</h:panelGrid>
+				</h:panelGrid>
+			</h:panelGrid>
+
+
+			<prime:dataTable value="#{produtoBean.produto.produtoTamanhos}"
+				id="valores" emptyMessage="Nenhum tamanho cadastrado." var="pt">
+
+				<prime:column style="width: 60%;">
+					<f:facet name="header">
+						<prime:outputLabel value="Tamanho" />
+					</f:facet>
+					<h:outputText value="#{pt.tamanho.nome}" />
+				</prime:column>
+
+				<prime:column style="width: 30%; text-align:center;">
+					<f:facet name="header">
+						<prime:outputLabel value="Valor" />
+					</f:facet>
+					<h:outputText value="#{pt.valor}">
+						<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+							type="currency" locale="PT-br" />
+					</h:outputText>
+				</prime:column>
+
+				<prime:column style="width: 10%; text-align:center;">
+					<f:facet name="header">
+						<prime:outputLabel value="Excluir" />
+					</f:facet>
+					<h:commandLink action="#{produtoBean.removerProdutoTamanho(pt)}">
+						<h:graphicImage value="/resources/imagens/ico16_excluir.gif"
+							width="30px" height="30px" alt="Excluir" />
+						<f:param name="cid" value="#{produtoBean.conversation.id}" />
+						<f:ajax event="action" execute="@this"
+							render=":globalMsgs valores" />
+					</h:commandLink>
+				</prime:column>
+			</prime:dataTable>
+
+			<h:panelGrid columns="3">
+				<h:commandButton value="Voltar" action="#{produtoBean.voltar}"
+					immediate="true" />
+			</h:panelGrid>
+		</prime:panel>
+	</ui:define>
+</ui:composition>

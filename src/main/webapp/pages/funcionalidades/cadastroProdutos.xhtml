@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+		<prime:panel header="Cadastro e Alteração de Produtos" id="cadastro">
+			<prime:panel header="Dados do Produto" id="produtosCadastro">
+				<h:panelGrid columns="2" id="campos">
+					<h:outputLabel value="Nome: " />
+					<h:panelGrid columns="2">
+						<prime:inputText id="nome" value="#{produtoBean.produto.nome}"
+							size="80" maxlength="80" />
+					</h:panelGrid>
+
+					<h:outputLabel value="Ingredientes: " />
+					<h:panelGrid columns="2">
+						<prime:inputTextarea id="ingredientes"
+							value="#{produtoBean.produto.ingredientes}" cols="80" />
+					</h:panelGrid>
+				</h:panelGrid>
+
+				<prime:spacer height="10px" />
+
+				<h:panelGrid columns="3">
+					<h:commandButton value="Novo" action="#{produtoBean.novoProduto}"
+						immediate="true">
+						<f:param name="cid" value="#{produtoBean.conversation.id}" />
+					</h:commandButton>
+
+					<h:commandButton value="Pesquisar"
+						action="#{produtoBean.pesquisarProduto}">
+						<f:ajax event="action" execute=":form:campos"
+							render=":globalMsgs :form:produtosTabela" />
+						<f:param name="cid" value="#{produtoBean.conversation.id}" />
+					</h:commandButton>
+					<h:commandButton value="Voltar" action="#{produtoBean.voltar}"
+						immediate="true" />
+				</h:panelGrid>
+			</prime:panel>
+			<prime:spacer height="8px" />
+			<prime:dataTable value="#{produtoBean.produtos}" id="produtosTabela"
+				paginator="true" paginatorAlwaysVisible="false"
+				emptyMessage="Nenhum registro encontrado." var="produto">
+
+				<f:facet name="header">
+					<prime:outputLabel value="Resultado" />
+				</f:facet>
+
+				<prime:column style="width: 30%;">
+					<f:facet name="header">
+						<prime:outputLabel value="Nome" />
+					</f:facet>
+					<h:outputText value="#{produto.nome}" />
+				</prime:column>
+
+				<prime:column style="text-align: left; width: 25%;">
+					<f:facet name="header">
+						<prime:outputLabel value="Ingredientes" />
+					</f:facet>
+					<h:outputText value="#{produto.ingredientes}" />
+				</prime:column>
+
+				<prime:column style="width: 20%; text-align:center;">
+					<f:facet name="header">
+						<prime:outputLabel value="Preço" />
+					</f:facet>
+					<h:outputText value="Preço não cadastrado!" rendered="#{produto.produtoTamanhos.isEmpty()}"/>
+					<h:dataTable value="#{produto.produtoTamanhos}" var="pt" rendered="#{!produto.produtoTamanhos.isEmpty()}"
+						widgetVar="100%">
+						<h:column>
+							<h:outputText value="#{pt.tamanho.sigla}: "
+								styleClass="fonte_negrito" />
+							<h:outputText value="#{pt.valor}" styleClass="fonte_vermelha">
+								<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+									type="currency" locale="PT-br" />
+							</h:outputText>
+						</h:column>
+					</h:dataTable>
+
+				</prime:column>
+
+				<prime:column style="width: 10%; text-align:center;">
+					<f:facet name="header">
+						<prime:outputLabel value="Tempo Preparo" />
+					</f:facet>
+					<h:outputText value="#{produto.tempoMedio} min." />
+				</prime:column>
+
+				<prime:column style="width: 15%; text-align:center;">
+					<f:facet name="header">
+						<prime:outputLabel value="Ações" />
+					</f:facet>
+
+					<h:commandLink action="#{produtoBean.editarProduto(produto)}">
+						<h:graphicImage value="/resources/imagens/ico16_alterar.gif"
+							width="30px" height="30px" alt="Alterar" />
+						<f:param name="cid" value="#{produtoBean.conversation.id}" />
+						<f:ajax event="action" execute="@this" render=":form:campos" />
+					</h:commandLink>
+					<prime:spacer width="10px" />
+					<h:commandLink action="#{produtoBean.excluirProduto(produto)}">
+						<h:graphicImage value="/resources/imagens/ico16_excluir.gif"
+							width="30px" height="30px" alt="Excluir" />
+						<f:param name="cid" value="#{produtoBean.conversation.id}" />
+						<f:ajax event="action" execute="@this"
+							render=":globalMsgs produtosTabela" />
+					</h:commandLink>
+					<prime:spacer width="10px" />
+					<h:commandLink action="#{produtoBean.adicionarValores(produto)}">
+						<f:param name="cid" value="#{produtoBean.conversation.id}" />
+						<h:graphicImage value="/resources/imagens/dindin.png" width="35px"
+							height="auto" alt="Cadastrar Valores" />
+					</h:commandLink>
+				</prime:column>
+			</prime:dataTable>
+		</prime:panel>
+	</ui:define>
+</ui:composition>

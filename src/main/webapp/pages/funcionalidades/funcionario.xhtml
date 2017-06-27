@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+		<prime:panel header="Cadastro e Alteração de funcionarios"
+			id="cadastro">
+			<prime:panel header="Dados do funcionario" id="funcionariosCadastro">
+				<h:panelGrid columns="2" id="camposGrid" style="width: 100%;">
+
+					<h:panelGrid columns="2" id="campos">
+						<h:outputLabel value="#{msg.label_nome}" />
+						<h:panelGrid columns="2">
+							<prime:inputText id="nome"
+								value="#{funcionarioBean.funcionario.nome}" required="true"
+								requiredMessage="Campo de preenchimento obrigatório." />
+							<prime:message for="nome" />
+						</h:panelGrid>
+
+						<h:outputLabel value="Login" />
+						<h:panelGrid columns="2">
+							<prime:inputText id="login" disabled="#{!usuarioLogadoBean.gerente and !usuarioLogadoBean.administrador}"
+								value="#{funcionarioBean.funcionario.login}" required="true"
+								requiredMessage="Campo de preenchimento obrigatório." />
+							<prime:message for="login" />
+						</h:panelGrid>
+
+						<h:outputLabel value="#{msg.label_senha}" />
+						<h:panelGrid columns="2">
+							<prime:password value="#{funcionarioBean.funcionario.senha}"
+								required="true"
+								requiredMessage="Campo de preenchimento obrigatório." id="senha"
+								feedback="true" promptLabel="#{msg.label_digite_senha}"
+								weakLabel="#{msg.label_fraca}" goodLabel="#{msg.label_boa}"
+								strongLabel="#{msg.label_forte}" />
+							<prime:message for="senha" />
+						</h:panelGrid>
+
+
+						<h:outputLabel value="#{msg.label_data_nascimento}" />
+						<h:panelGrid columns="2">
+							<prime:calendar styleClass="texto"
+								value="#{funcionarioBean.funcionario.dataNascimento}"
+								required="true"
+								requiredMessage="Campo de preenchimento obrigatório."
+								converter="dateConverter" id="data" navigator="true"
+								showOtherMonths="true" showButtonPanel="true" showEffect="fade"
+								hideEffect="fade" yearRange="c-50:c+10" locale="pt_BR"
+								pattern="dd/MM/yyyy" readonlyInput="true" />
+							<prime:message for="data" />
+						</h:panelGrid>
+
+
+						<h:outputLabel value="#{msg.label_telefone}" />
+						<h:panelGrid columns="2">
+							<prime:inputMask value="#{funcionarioBean.funcionario.telefone}"
+								required="true"
+								requiredMessage="Campo de preenchimento obrigatório."
+								id="telefone" mask="(99) 9999-9999" />
+							<prime:message for="telefone" />
+						</h:panelGrid>
+
+
+						<h:outputLabel value="Endereço" />
+						<h:panelGrid columns="2">
+							<prime:inputText id="endereco" required="true"
+								requiredMessage="Campo de preenchimento obrigatório."
+								value="#{funcionarioBean.funcionario.endereco}" />
+							<prime:message for="endereco" />
+						</h:panelGrid>
+						
+						<h:outputLabel value="Empresa" rendered="#{usuarioLogadoBean.administrador}"/>
+						<h:panelGrid columns="2" rendered="#{usuarioLogadoBean.administrador}">
+							<h:selectOneMenu value="#{funcionarioBean.funcionario.empresa}" converter="empresaConverter"
+								id="empresa" required="true" requiredMessage="Campo de preenchimento obrigatório.">
+								<f:selectItems value="#{funcionarioBean.empresasSI}"/>
+							</h:selectOneMenu>
+							<prime:message for="empresa" />
+						</h:panelGrid>
+						
+						<h:outputLabel value="Perfil de Acesso" rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.administrador}"/>
+						<h:panelGrid columns="2" rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.administrador}">
+							<h:selectOneMenu value="#{funcionarioBean.funcionario.tipoUsuario}"
+								id="perfil" required="true" requiredMessage="Campo de preenchimento obrigatório.">
+								<f:selectItems value="#{funcionarioBean.tiposUsuario}"/>
+							</h:selectOneMenu>
+							<prime:message for="perfil" />
+						</h:panelGrid>
+					</h:panelGrid>
+
+					<prime:spacer height="10px" />
+
+					<h:panelGrid columns="3">
+						<h:commandButton value="Salvar"
+							action="#{funcionarioBean.salvarFuncionario}">
+							<f:param name="cid" value="#{funcionarioBean.conversation.id}" />
+						</h:commandButton>
+						<h:commandButton value="Voltar" action="#{funcionarioBean.voltar()}"
+							immediate="true" />
+					</h:panelGrid>
+				</h:panelGrid>
+			</prime:panel>
+		</prime:panel>
+	</ui:define>
+</ui:composition>

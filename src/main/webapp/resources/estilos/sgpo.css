@@ -1,0 +1,133 @@
+@media screen and (max-width:480px) {
+	html {
+		font-size: 50%;
+	}
+}
+
+@media screen and (min-width: 481px) and (max-width: 768px) {
+	html {
+		font-size: 75%;
+	}
+}
+
+html {
+	marging: 0px;
+	padding: 0px;
+	font-size: 85%;
+}
+
+/* .ui-datatable .ui-datatable-data .ui-datatable-odd td{   */
+/* 	background-color: silver; */
+/* } */
+/* .ui-datatable .ui-datatable-data .ui-datatable-even td{   */
+/* 	background-color: #F2F5F9; */
+/* } 
+
+	background-color:#5f3c24;
+	background-image:linear-gradient(to bottom, transparent 1px, rgba(0,0,0,.1) 1px);
+	background-size: auto 1px;
+	
+	
+	background-image: url('/sgpo/resources/imagens/back/wood2.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-repeat: repeat-y;
+*/
+body {
+	background-image: url('/sgpo/resources/imagens/back/wood2.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-repeat: repeat-y;
+}
+
+.tabela thead {
+	display: none;
+}
+
+.tabela table td tr {
+	border: 0px !important;
+	border-style: hidden !important;
+	border-color: inherit !important;
+}
+
+img,video {
+	max-width: 100%;
+}
+
+input[type="text"] {
+	width: 100%;
+}
+
+input[type="password"] {
+	width: 100%;
+}
+
+.divprincipal {
+	bottom: 0;
+	left: 0;
+	right: 0;
+	top: 0;
+	padding: 2% 5% 2% 5%;
+	overflow: auto;
+	position: absolute;
+	display: block;
+}
+
+.login_page {
+	bottom: 0;
+	left: 0;
+	right: 0;
+	top: 0;
+	overflow: auto;
+	padding: 5%;
+	position: absolute;
+}
+
+.credenciais {
+	display: block;
+	position: absolute;
+	width: 300px;
+	heigth: 200px;
+	top: 50%;
+	left: 50%;
+	margin: -100px 0 0 -150px
+}
+
+.label {
+	width: 20%;
+}
+
+.valor {
+	width: 80%;
+}
+
+.fonte_negrito {
+	font-weight: bold;
+}
+
+.oitenta {
+	width: 60%;
+}
+
+.ui-accordion .ui-accordion-content {
+	padding: 0em 0em;
+	border-top: 0;
+	margin-top: -2px;
+	position: relative;
+	top: 1px;
+	margin-bottom: 2px;
+	overflow: auto;
+	zoom: 1;
+}
+
+.vinte {
+	width: 20%;
+}
+
+.fonte_vermelha {
+	color: Red;
+}
+
+.fonte_azul {
+	color: Blue;
+}

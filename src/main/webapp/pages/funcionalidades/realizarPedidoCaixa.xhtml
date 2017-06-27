@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+		<prime:panel header="Realizar Pedidos" id="realizarpedidos">
+			<prime:panel header="Localizar cliente" id="cliente">
+				<prime:panelGrid columns="2" layout="grid">
+					<prime:autoComplete id="acNome" minQueryLength="2" var="cli"
+						itemLabel="#{cli.nome}" itemValue="#{cli}"
+						converter="usuarioConverter" style="width:100%;"
+						value="#{realizarPedidoBean.clientePesquisa}"
+						completeMethod="#{realizarPedidoBean.autoCompleteNome}"
+						placeholder="Nome">
+						<prime:ajax event="itemSelect" listener="#{realizarPedidoBean.onClienteSelecionado}" update=":globalMsgs :form:realizarpedidos"/>
+						<f:param name="cid" value="#{realizarPedidoBean.conversation.id}" />
+					</prime:autoComplete>
+					<prime:autoComplete id="acLogin" minQueryLength="2" var="cli"
+						itemLabel="#{cli.login}" itemValue="#{cli}"
+						converter="usuarioConverter" placeholder="Login"
+						style="width:100%;" value="#{realizarPedidoBean.clientePesquisa}"
+						completeMethod="#{realizarPedidoBean.autoCompleteLogin}">
+						<prime:ajax event="itemSelect" listener="#{realizarPedidoBean.onClienteSelecionado}" update=":globalMsgs :form:realizarpedidos"/>
+						<f:param name="cid" value="#{realizarPedidoBean.conversation.id}" />
+					</prime:autoComplete>
+				</prime:panelGrid>
+			</prime:panel>
+
+			<prime:spacer height="10px" />
+
+			<prime:panel header="Dados do cliente" id="gridcliente"
+				rendered="#{realizarPedidoBean.cliente != null}">
+				<h:panelGrid columns="2" id="campos">
+					<h:outputLabel value="#{msg.label_nome}:" />
+					<h:outputText value="#{realizarPedidoBean.cliente.nome}" />
+
+					<h:outputLabel value="Login:" />
+					<h:outputText value="#{realizarPedidoBean.cliente.login}" />
+
+					<h:outputLabel value="#{msg.label_telefone}:" />
+					<h:outputText value="#{realizarPedidoBean.cliente.telefone}" />
+
+					<h:outputLabel value="Endereço:" />
+					<h:outputText value="#{realizarPedidoBean.cliente.endereco}" />
+
+					<h:outputLabel value="Tipo de Pedido" />
+					<h:panelGrid columns="2">
+						<h:selectOneMenu value="#{realizarPedidoBean.pedido.tipoPedido}"
+							id="tipoPedido" required="true"
+							requiredMessage="Campo de preenchimento obrigatório.">
+							<f:selectItems value="#{realizarPedidoBean.tiposPedido}" />
+							<f:ajax event="change" execute="@this"
+								render=":globalMsgs realizarpedidos" />
+							<f:param name="cid" value="#{realizarPedidoBean.conversation.id}" />
+						</h:selectOneMenu>
+						<prime:message for="tipoPedido" />
+					</h:panelGrid>
+
+					<h:outputLabel value="Número da Mesa:"
+						rendered="#{realizarPedidoBean.pedido.tipoPedido eq 'MESA' or realizarPedidoBean.pedido.tipoPedido eq 'VIAGEM'}" />
+					<h:panelGrid columns="2"
+						rendered="#{realizarPedidoBean.pedido.tipoPedido eq 'MESA' or realizarPedidoBean.pedido.tipoPedido eq 'VIAGEM'}">
+						<h:inputText id="mesa" value="#{realizarPedidoBean.pedido.mesa}"
+							required="true" requiredMessage="Digite o número da mesa"
+							converter="javax.faces.Integer"
+							converterMessage="Digite um número inteiro">
+							<f:ajax event="change" execute="@this"
+								render=":globalMsgs realizarpedidos" />
+							<f:param name="cid" value="#{realizarPedidoBean.conversation.id}" />
+						</h:inputText>
+
+						<prime:message for="mesa" />
+					</h:panelGrid>
+				</h:panelGrid>
+			</prime:panel>
+
+			<prime:spacer height="10px" />
+
+			<prime:panel header="Cardápio">
+				<prime:accordionPanel id="acordion" activeIndex="-1"
+					value="#{realizarPedidoBean.categoriasList}" var="categoria">
+					<prime:tab title="#{categoria.nome}" closable="true" titletip="d">
+						<prime:dataTable value="#{categoria.produtos}" id="cardapioTabela"
+							emptyMessage="O cardápio não foi carregado." paginator="true"
+							rows="12" paginatorAlwaysVisible="false" rowIndexVar="linha"
+							var="p">
+
+							<prime:column style="text-align:center; width: 5%;">
+								<f:facet name="header">
+									<h:outputText value="Num." />
+								</f:facet>
+								<h:outputText value="#{linha+1}" />
+							</prime:column>
+
+							<prime:column style="width: 20%;">
+								<f:facet name="header">
+									<h:outputText value="Nome:" />
+								</f:facet>
+								<h:outputText value="#{p.nome}" />
+							</prime:column>
+
+							<prime:column style="width: 30%;">
+								<f:facet name="header">
+									<h:outputText value="Ingredientes:" />
+								</f:facet>
+								<h:outputText value="#{p.ingredientes}" />
+							</prime:column>
+
+							<prime:column style="text-align: center; width: 10%;">
+								<f:facet name="header">
+									<h:outputText value="Tempo" />
+								</f:facet>
+								<h:outputText value="#{p.tempoMedio} minutos" />
+							</prime:column>
+
+							<prime:column style="text-align: center; width: 25%;">
+								<f:facet name="header">
+									<h:outputText value="Valor" />
+								</f:facet>
+
+								<h:outputText value="Preço não cadastrado!"
+									rendered="#{p.produtoTamanhos.isEmpty()}" />
+
+								<h:dataTable value="#{p.produtoTamanhos}" var="pt"
+									rendered="#{!p.produtoTamanhos.isEmpty()}" widgetVar="100%"
+									columnClasses="vinte, oitenta, vinte">
+									<h:column>
+										<h:outputText value="#{pt.tamanho.sigla}"
+											styleClass="fonte_negrito" />
+									</h:column>
+									<h:column>
+										<h:outputText value="#{pt.valor}" styleClass="fonte_vermelha">
+											<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+												type="currency" locale="PT-br" />
+										</h:outputText>
+									</h:column>
+
+									<h:column style="text-align: center;">
+										<h:commandLink
+											action="#{realizarPedidoBean.adicionaAoPedido(pt)}">
+											<h:graphicImage value="/resources/imagens/mais.png"
+												width="35px" height="auto" />
+											<f:param name="cid"
+												value="#{realizarPedidoBean.conversation.id}" />
+											<f:ajax event="action" execute="@this"
+												render=":globalMsgs :form:pedidosTabela :form:final" />
+										</h:commandLink>
+									</h:column>
+								</h:dataTable>
+							</prime:column>
+						</prime:dataTable>
+					</prime:tab>
+				</prime:accordionPanel>
+			</prime:panel>
+
+
+
+			<prime:spacer height="10px" />
+
+
+			<prime:panel header="Pedido">
+				<prime:dataTable value="#{realizarPedidoBean.pedido.items}"
+					id="pedidosTabela" paginator="false" paginatorAlwaysVisible="false"
+					rows="5" emptyMessage="#{msg.msg_pedido_vazio}" var="i"
+					rowIndexVar="linha">
+
+					<prime:column style="text-align:center; width: 5%;">
+						<f:facet name="header">
+							<h:outputText value="Item" />
+						</f:facet>
+						<h:outputText value="#{linha+1}" />
+					</prime:column>
+
+					<prime:column width="75%">
+						<f:facet name="header">
+							<h:outputText value="Nome | Ingredientes | Tamanho" />
+						</f:facet>
+
+						<prime:dataTable value="#{i.produtoTamanhos}" var="pt"
+							styleClass="tabela">
+							<prime:column style="width: 40%;">
+								<h:outputText value="#{i.proporcao}" styleClass="fonte_negrito" />
+								<h:outputText value=" " />
+								<h:outputText value="#{pt.produto.nome}" />
+							</prime:column>
+
+							<prime:column style="width: 50%;">
+								<h:outputText value="#{pt.produto.ingredientes}" />
+							</prime:column>
+
+							<prime:column style="text-align: center; width: 20%;">
+								<h:outputText value="#{pt.tamanho.nome}" />
+							</prime:column>
+						</prime:dataTable>
+
+					</prime:column>
+
+					<prime:column style="text-align: center; width: 10%;">
+						<f:facet name="header">
+							<h:outputText value="Valor" />
+						</f:facet>
+						<h:outputText value="#{i.valor}" styleClass="fonte_vermelha">
+							<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+								type="currency" locale="PT-br" />
+						</h:outputText>
+					</prime:column>
+
+					<prime:column style="text-align: center; width: 10%;">
+						<f:facet name="header">
+							<h:outputText value="Remover" />
+						</f:facet>
+						<prime:panelGrid columns="1">
+
+
+							<h:graphicImage value="/resources/imagens/pizza1.png"
+								width="35px" height="auto"
+								rendered="#{realizarPedidoBean.isPizza(i)}">
+								<prime:ajax event="click" update=":form:sabores"
+									oncomplete="PF('sabores').show();"
+									listener="#{realizarPedidoBean.setItem(i)}" />
+								<f:param name="cid"
+									value="#{realizarPedidoBean.conversation.id}" />
+							</h:graphicImage>
+
+
+
+							<h:commandLink action="#{realizarPedidoBean.removerDoPedido(i)}">
+								<h:graphicImage value="/resources/imagens/menos.png"
+									width="35px" height="auto" />
+								<f:param name="cid"
+									value="#{realizarPedidoBean.conversation.id}" />
+								<f:ajax event="action" execute="@this"
+									render=":globalMsgs :form:pedidosTabela :form:final" />
+							</h:commandLink>
+						</prime:panelGrid>
+					</prime:column>
+				</prime:dataTable>
+			</prime:panel>
+
+			<prime:spacer height="10px" />
+
+			<prime:panel header="Observações:" id="obs"
+				style="display: table; width: 99.5%;" collapsed="false">
+				<prime:inputTextarea
+					value="#{realizarPedidoBean.pedido.observacoes}"
+					style="width:100%;">
+					<f:ajax event="blur" execute="@this" />
+				</prime:inputTextarea>
+			</prime:panel>
+
+			<prime:panel header="Finalizar" id="final"
+				style="display: table; width: 99.5%;">
+
+				<h:panelGroup layout="block">
+					<h:outputText value="TOTAL:  " style="font-size:250% !important;"
+						styleClass="fonte_negrito" />
+					<prime:spacer width="10px" />
+					<h:outputText value="#{realizarPedidoBean.pedido.valorPedido}"
+						style="font-size:250% !important;"
+						styleClass="fonte_vermelha fonte_negrito">
+						<f:convertNumber currencySymbol="R$" maxFractionDigits="2"
+							type="currency" locale="PT-br" />
+					</h:outputText>
+				</h:panelGroup>
+				<prime:spacer height="20px" />
+				<h:panelGroup layout="block" style="float:right;">
+					<h:commandButton value="Enviar Pedido à Cozinha"
+						action="#{realizarPedidoBean.realizarPedido()}">
+						<f:ajax event="action" execute=":form:campos"
+							render=":globalMsgs realizarpedidos" />
+						<f:param name="cid" value="#{realizarPedidoBean.conversation.id}" />
+					</h:commandButton>
+
+					<prime:spacer width="5px" />
+
+					<h:commandButton value="Voltar"
+						action="#{realizarPedidoBean.voltar}" immediate="true" />
+				</h:panelGroup>
+			</prime:panel>
+		</prime:panel>
+
+		<prime:dialog id="sabores" widgetVar="sabores" modal="true"
+			height="300px" width="800px" closable="true" resizable="false"
+			draggable="false">
+
+			<f:facet name="header">
+				<h:outputText value="### Adicionar Sabores ###" />
+			</f:facet>
+
+
+			<prime:panel header="Pizzas" id="item">
+				<prime:dataTable
+					value="#{realizarPedidoBean.buscarProdutosPorTamanhoCategoria()}"
+					var="pt">
+					<prime:column style="width: 30%;">
+						<f:facet name="header">
+							<h:outputText value="Nome" />
+						</f:facet>
+						<h:outputText value="#{pt.produto.nome}" />
+					</prime:column>
+
+					<prime:column style="width: 50%;">
+						<f:facet name="header">
+							<h:outputText value="Ingredientes" />
+						</f:facet>
+						<h:outputText value="#{pt.produto.ingredientes}" />
+					</prime:column>
+
+					<prime:column style="text-align: center; width: 10%;">
+						<h:commandLink action="#{realizarPedidoBean.adicionaAoItem(pt)}">
+							<h:graphicImage value="/resources/imagens/mais.png" width="35px"
+								height="auto" />
+							<f:param name="cid" value="#{realizarPedidoBean.conversation.id}" />
+							<f:ajax event="action" execute="@this"
+								render=":globalMsgs :form:pedidosTabela :form:final" />
+						</h:commandLink>
+					</prime:column>
+				</prime:dataTable>
+			</prime:panel>
+		</prime:dialog>
+	</ui:define>
+</ui:composition>

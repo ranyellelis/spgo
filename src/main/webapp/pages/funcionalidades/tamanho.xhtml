@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+
+		<prime:panel header="Cadastro e Alteração de Tamanhos" id="cadastro">
+			<prime:panel header="Dados do Tamanho" id="tamanhosCadastro">
+				<h:panelGrid columns="3" id="campos">
+					<h:outputLabel value="Nome: " />
+					<prime:inputText id="nome" value="#{tamanhoBean.tamanho.nome}"
+						size="80" maxlength="80" />
+					<prime:message for="nome"/>
+					<h:outputLabel value="Sigla: " />
+					<prime:inputText id="sigla" value="#{tamanhoBean.tamanho.sigla}"
+						size="80" maxlength="80" />
+					<prime:message for="sigla"/>
+					<h:outputLabel value="Quantidade de partes: " />
+					<prime:inputText id="partes" value="#{tamanhoBean.tamanho.partes}" size="10" maxlength="10"
+						converterMessage="Digite um número!">
+						<f:convertNumber  type="number" />
+					</prime:inputText>
+					<prime:message for="partes"/>
+				</h:panelGrid>
+
+				<prime:spacer height="10px" />
+
+				<h:panelGrid columns="3">
+					<h:commandButton value="Salvar"
+						action="#{tamanhoBean.salvarTamanho}">
+						<f:param name="cid" value="#{tamanhoBean.conversation.id}" />
+					</h:commandButton>
+					<h:commandButton value="Voltar" action="#{tamanhoBean.voltar}"
+						immediate="true" />
+				</h:panelGrid>
+			</prime:panel>
+		</prime:panel>
+	</ui:define>
+</ui:composition>

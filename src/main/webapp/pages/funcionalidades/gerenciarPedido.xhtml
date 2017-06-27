@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition template="/pages/template.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:prime="http://primefaces.org/ui">
+	<ui:define name="cabecalho" />
+	<ui:define name="corpo">
+		<prime:panel header="Atendimento de Pedidos" id="gerenciarpedidos">
+			<h:panelGroup layout="block">
+				<prime:panel header="Dados do Funcionário" id="dados_Usuario">
+					<h:panelGrid columns="2" id="campos">
+						<h:outputLabel value="#{msg.label_nome}:" />
+						<h:outputText value="#{gerenciarPedidoBean.funcionario.nome}" />
+
+						<h:outputLabel value="Login:" />
+						<h:outputText value="#{gerenciarPedidoBean.funcionario.login}" />
+
+						<h:outputLabel value="#{msg.label_telefone}:" />
+						<h:outputText value="#{gerenciarPedidoBean.funcionario.telefone}" />
+
+						<h:outputLabel value="Alterar:" />
+						<h:commandLink action="#{funcionarioBean.editarFuncionarioAtendimento(gerenciarPedidoBean.funcionario)}">
+							<h:graphicImage value="/resources/imagens/ico16_alterar.gif"
+								title="Detalhar" width="20%" height="auto" />
+							<f:param name="cid" value="#{funcionarioBean.conversation.id}" />
+						</h:commandLink>
+					</h:panelGrid>
+				</prime:panel>
+
+				<prime:spacer height="10px" />
+
+				<prime:panel header="Situação de Pedidos" id="pedidos">
+					<prime:dataTable id="efetuado" paginator="true"
+						paginatorAlwaysVisible="false" rows="5"
+						value="#{gerenciarPedidoBean.pedidosEfetuados}"
+						emptyMessage="Nenhum pedido na lista" var="p"
+						rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.garcom or usuarioLogadoBean.preparador}">
+
+						<f:facet name="header">
+							<h:outputText value="Realizados" />
+						</f:facet>
+
+						<prime:column style="width: 10%;  text-align:center;">
+							<f:facet name="header">
+								<h:outputText value="Número" />
+							</f:facet>
+							<h:outputText value="#{p.numero}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 35%;">
+							<f:facet name="header">
+								<h:outputText value="Local" />
+							</f:facet>
+							<h:outputText value="#{p.tipoPedido.value}" />
+							<h:outputText value=": #{p.mesa}"
+								rendered="#{p.tipoPedido eq 'MESA' or p.tipoPedido eq 'VIAGEM'}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 35%;">
+							<f:facet name="header">
+								<h:outputText value="Hora" />
+							</f:facet>
+							<h:outputText value="#{p.horaPedido}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 20%;">
+							<f:facet name="header">
+								<h:outputText value="Preparar?" />
+							</f:facet>
+
+							<h:commandLink action="#{gerenciarPedidoBean.prepararPedido(p)}"
+								rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.preparador}">
+								<h:graphicImage value="/resources/imagens/ok_icon.png"
+									title="OK" width="20%" height="auto" />
+								<f:param name="cid"
+									value="#{gerenciarPedidoBean.conversation.id}" />
+								<f:ajax event="action" execute="@this"
+									render=":globalMsgs :form:efetuado :form:preparando" />
+							</h:commandLink>
+
+							<h:commandLink action="#{gerenciarPedidoBean.cancelarPedido(p)}"
+								rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.garcom}">
+								<h:graphicImage value="/resources/imagens/cancelar.png"
+									title="Cancelar" width="20%" height="auto" />
+								<f:param name="cid"
+									value="#{gerenciarPedidoBean.conversation.id}" />
+								<f:ajax event="action" execute="@this"
+									render=":globalMsgs :form:efetuado :form:preparando" />
+							</h:commandLink>
+							<h:commandLink action="#{gerenciarPedidoBean.detalharPedido(p)}">
+								<h:graphicImage
+									value="/resources/imagens/ico_visualizar_64x64.png"
+									title="Detalhar" width="20%" height="auto" />
+								<f:param name="cid"
+									value="#{gerenciarPedidoBean.conversation.id}" />
+							</h:commandLink>
+							<h:commandLink
+								action="#{gerenciarPedidoBean.pedidoBean.imprimirPedido(p)}"
+								immediate="true" rendered="#{usuarioLogadoBean.gerente}">
+								<h:graphicImage value="/resources/imagens/ico_impress.png"
+									width="40px" height="40px" />
+								<f:param name="pedido" value="#{p}" />
+							</h:commandLink>
+						</prime:column>
+					</prime:dataTable>
+
+					<prime:dataTable id="preparando" paginator="true"
+						paginatorAlwaysVisible="false" rows="5"
+						value="#{gerenciarPedidoBean.pedidosEmPreparo}"
+						emptyMessage="Nenhum pedido na lista" var="p"
+						rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.preparador}">
+
+						<f:facet name="header">
+							<h:outputText value="Preparando" />
+						</f:facet>
+
+						<prime:column style="width: 10%;  text-align:center;">
+							<f:facet name="header">
+								<h:outputText value="Número" />
+							</f:facet>
+							<h:outputText value="#{p.numero}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 20%;">
+							<f:facet name="header">
+								<h:outputText value="Local" />
+							</f:facet>
+							<h:outputText value="#{p.tipoPedido.value}" />
+							<h:outputText value=": #{p.mesa}"
+								rendered="#{p.tipoPedido eq 'MESA' or p.tipoPedido eq 'VIAGEM'}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 20%;">
+							<f:facet name="header">
+								<h:outputText value="Hora" />
+							</f:facet>
+							<h:outputText value="#{p.horaPedido}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 30%;">
+							<f:facet name="header">
+								<h:outputText value="Responsável" />
+							</f:facet>
+							<h:outputText value="#{p.funcionario.nome}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 20%;">
+							<f:facet name="header">
+								<h:outputText value="Pronto?" />
+							</f:facet>
+
+							<h:commandLink action="#{gerenciarPedidoBean.concluirPedido(p)}">
+								<h:graphicImage value="/resources/imagens/ok_icon.png"
+									title="OK" width="20%" height="auto" />
+								<f:param name="cid"
+									value="#{gerenciarPedidoBean.conversation.id}" />
+								<f:ajax event="action" execute="@this"
+									render=":globalMsgs :form:prontos :form:preparando" />
+							</h:commandLink>
+
+							<h:commandLink action="#{gerenciarPedidoBean.cancelarPedido(p)}">
+								<h:graphicImage value="/resources/imagens/cancelar.png"
+									title="Cancelar" width="20%" height="auto" />
+								<f:param name="cid"
+									value="#{gerenciarPedidoBean.conversation.id}" />
+								<f:ajax event="action" execute="@this"
+									render=":globalMsgs :form:efetuado :form:preparando" />
+							</h:commandLink>
+
+							<h:commandLink action="#{gerenciarPedidoBean.detalharPedido(p)}">
+								<h:graphicImage
+									value="/resources/imagens/ico_visualizar_64x64.png"
+									title="Detalhar" width="20%" height="auto" />
+								<f:param name="cid"
+									value="#{gerenciarPedidoBean.conversation.id}" />
+							</h:commandLink>
+							<h:commandLink
+								action="#{gerenciarPedidoBean.pedidoBean.imprimirPedido(p)}"
+								immediate="true" rendered="#{usuarioLogadoBean.gerente}">
+								<h:graphicImage value="/resources/imagens/ico_impress.png"
+									width="40px" height="40px" />
+								<f:param name="pedido" value="#{p}" />
+							</h:commandLink>
+						</prime:column>
+					</prime:dataTable>
+
+
+					<prime:dataTable id="prontos" paginator="true"
+						paginatorAlwaysVisible="false" rows="5"
+						value="#{gerenciarPedidoBean.pedidosProntos}"
+						emptyMessage="Nenhum pedido na lista" var="p"
+						rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.garcom or usuarioLogadoBean.entregador}">
+
+						<f:facet name="header">
+							<h:outputText value="Prontos" />
+						</f:facet>
+
+						<prime:column style="width: 10%;  text-align:center;">
+							<f:facet name="header">
+								<h:outputText value="Número" />
+							</f:facet>
+							<h:outputText value="#{p.numero}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 20%;">
+							<f:facet name="header">
+								<h:outputText value="Local" />
+							</f:facet>
+							<h:outputText value="#{p.tipoPedido.value}" />
+							<h:outputText value=": #{p.mesa}"
+								rendered="#{p.tipoPedido eq 'MESA' or p.tipoPedido eq 'VIAGEM'}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 20%;">
+							<f:facet name="header">
+								<h:outputText value="Hora" />
+							</f:facet>
+							<h:outputText value="#{p.horaPedido}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 30%;">
+							<f:facet name="header">
+								<h:outputText value="Responsável" />
+							</f:facet>
+							<h:outputText value="#{p.funcionario.nome}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 20%;">
+							<f:facet name="header">
+								<h:outputText value="Entregar?" />
+							</f:facet>
+							<h:commandLink action="#{gerenciarPedidoBean.entregarPedido(p)}"
+								rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.garcom or usuarioLogadoBean.entregador}">
+								<h:graphicImage value="/resources/imagens/ok_icon.png"
+									title="OK" width="20%" height="auto" />
+								<f:param name="cid"
+									value="#{gerenciarPedidoBean.conversation.id}" />
+								<f:ajax event="action" execute="@this"
+									render=":globalMsgs :form:prontos :form:entregues" />
+							</h:commandLink>
+							<h:commandLink action="#{gerenciarPedidoBean.detalharPedido(p)}">
+								<h:graphicImage
+									value="/resources/imagens/ico_visualizar_64x64.png"
+									title="Detalhar" width="20%" height="auto" />
+								<f:param name="cid"
+									value="#{gerenciarPedidoBean.conversation.id}" />
+							</h:commandLink>
+
+							<h:commandLink
+								action="#{gerenciarPedidoBean.pedidoBean.imprimirPedido(p)}"
+								immediate="true" rendered="#{usuarioLogadoBean.gerente}">
+								<h:graphicImage value="/resources/imagens/ico_impress.png"
+									width="40px" height="40px" />
+								<f:param name="pedido" value="#{p}" />
+							</h:commandLink>
+						</prime:column>
+					</prime:dataTable>
+
+					<prime:dataTable id="entregues" paginator="true"
+						paginatorAlwaysVisible="false" rows="5"
+						value="#{gerenciarPedidoBean.pedidosEntregues}"
+						emptyMessage="Nenhum pedido na lista" var="p"
+						rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.garcom or usuarioLogadoBean.entregador}">
+
+						<f:facet name="header">
+							<h:outputText value="Entregando" />
+						</f:facet>
+
+
+						<prime:column style="width: 10%;  text-align:center;">
+							<f:facet name="header">
+								<h:outputText value="Número" />
+							</f:facet>
+							<h:outputText value="#{p.numero}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 20%;">
+							<f:facet name="header">
+								<h:outputText value="Local" />
+							</f:facet>
+							<h:outputText value="#{p.tipoPedido.value}" />
+							<h:outputText value=": #{p.mesa}"
+								rendered="#{p.tipoPedido eq 'MESA' or p.tipoPedido eq 'VIAGEM'}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 20%;">
+							<f:facet name="header">
+								<h:outputText value="Hora" />
+							</f:facet>
+							<h:outputText value="#{p.horaPedido}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 30%;">
+							<f:facet name="header">
+								<h:outputText value="Responsável" />
+							</f:facet>
+							<h:outputText value="#{p.funcionario.nome}" />
+						</prime:column>
+
+						<prime:column style="text-align: center; width: 20%;">
+							<f:facet name="header">
+								<h:outputText value="Entregue?" />
+							</f:facet>
+							<h:commandLink
+								action="#{gerenciarPedidoBean.concluirEntregaPedido(p)}"
+								rendered="#{usuarioLogadoBean.gerente or usuarioLogadoBean.garcom or usuarioLogadoBean.entregador}">
+								<h:graphicImage value="/resources/imagens/ok_icon.png"
+									title="OK" width="20%" height="auto" />
+								<f:param name="cid"
+									value="#{gerenciarPedidoBean.conversation.id}" />
+								<f:ajax event="action" execute="@this"
+									render=":globalMsgs :form:entregues" />
+							</h:commandLink>
+							<h:commandLink action="#{gerenciarPedidoBean.detalharPedido(p)}">
+								<h:graphicImage
+									value="/resources/imagens/ico_visualizar_64x64.png"
+									title="Detalhar" width="20%" height="auto" />
+								<f:param name="cid"
+									value="#{gerenciarPedidoBean.conversation.id}" />
+							</h:commandLink>
+							<h:commandLink
+								action="#{gerenciarPedidoBean.pedidoBean.imprimirPedido(p)}"
+								immediate="true" rendered="#{usuarioLogadoBean.gerente}">
+								<h:graphicImage value="/resources/imagens/ico_impress.png"
+									width="40px" height="40px" />
+								<f:param name="pedido" value="#{p}" />
+							</h:commandLink>
+						</prime:column>
+					</prime:dataTable>
+				</prime:panel>
+
+				<prime:spacer height="10px" />
+
+				<prime:panel header="Ações" id="final">
+					<h:panelGroup layout="block">
+						<h:commandButton value="Atualizar"
+							action="#{gerenciarPedidoBean.atualizar()}">
+							<f:ajax event="action" execute="@this" render=":globalMsgs :form" />
+							<f:param name="cid"
+								value="#{gerenciarPedidoBean.conversation.id}" />
+						</h:commandButton>
+						<prime:spacer width="5px" />
+						<h:commandButton value="Voltar"
+							action="#{gerenciarPedidoBean.voltar}" immediate="true" />
+					</h:panelGroup>
+					<prime:spacer height="20px" />
+				</prime:panel>
+			</h:panelGroup>
+		</prime:panel>
+	</ui:define>
+</ui:composition>
